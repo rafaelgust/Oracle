@@ -67,9 +67,9 @@ SELECT NOME, ADMISSAO
     
 ---- FUNÇÕES GENÉRICAS
 -- NVL (EXPR1, EXPR2) --- SE O PRIMEIRO VALOR FOR NULO, VAI UTILIZAR O SEGUINDO
--- NVL2 (EXPR1, EXPR2, EXPR3)
--- NULLIF (EXPR1, EXPR2)
--- COALESCE (EXPR1, EXPR2, ...., EXPRN)
+-- NVL2 (EXPR1, EXPR2, EXPR3) --- SE O PRIMEIRO VALOR FOR NULO, ELE VERIFICA O SEGUINTE E SE FOR NULO ELE VAI PARA O TERCEIRO VALOR
+-- NULLIF (EXPR1, EXPR2) --- SE FOR IGUAL A EXPR1 E EXPR2 - IRA RETORNAR NULL, CASO FOR DIFERENTE O NULLIF RETORNA EXPR1
+-- COALESCE (EXPR1, EXPR2, ...., EXPRN) --- VAI PROCURAR DA ESQUERDA PRA DIREITA E RETORNAR O PRIMEIRO VALOR QUE NÃO FOR NULO
 
 
 ---- SELECT last_name, salary, NVL(comission_pct, 0), salary*12 SALARIO_ATUAL,
@@ -77,6 +77,56 @@ SELECT NOME, ADMISSAO
                 --- FROM employee;
 --- NVL p/ evitar resultado nulo, uma vez que null x valor é igual a nulo
 
+SELECT NULLIF(1000,1000) FROM dual; -- null
+SELECT NULLIF(1000,2000) FROM dual; -- 1000
+
+SELECT COALESCE(NULL, NULL, 'VALOR'), COALESCE(NULL, NULL, 'VALOR1', 'VALOR2'), COALESCE('VALOR1', 'VALOR2', 'VALOR3') FROM dual;
+--- retornar VALOR - VALOR1 - VALOR1
+
+---- EXPRESSÕES CONDICIONAIS
+--- IF-THEN-ELSE
+--- CASE
+--- DECODE
+
+------ CASE
+-------- CASE expr WHEN expr1 THEN
+---------  return_expr1
+----------  [WHEN expr2 THEN
+----------  return_expr2
+----------  WHEN exprN THEN
+----------  return_exprN
+----------  ELSE
+----------  else_expr]
+-------- END alias;
+
+SELECT 
+    CLIENTE, BAIRROCOB,
+        CASE ESTCOB
+            WHEN 'MG'
+                THEN 'MINAS'
+            WHEN 'RJ'
+                THEN 'RIO'
+            WHEN 'BA'
+                THEN 'BAHIA'
+            ELSE 'OUTRO'
+        END "NOVA COLUNA COM CASE"
+FROM PCCLIENT;
+
+------ DECODE
+-------- DECODE(col|expressão, arg1, resulta1
+--------- [,arg2, result2, ....,]
+--------- [, default]
+-------- )
+
+SELECT 
+    CLIENTE, BAIRROCOB,
+        DECODE(ESTCOB,
+            'MG', 'MINAS',
+            'RJ', 'RIO',
+            'BA', 'BAHIA',
+            'OUTRO'
+        ) "NOVA COLUNA COM DECODE"
+FROM PCCLIENT;
 
 
 
