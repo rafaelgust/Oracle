@@ -231,3 +231,129 @@ WHERE NOT EXISTS (
 -- Dica:
 -- Use EXISTS para checagem de existência, especialmente em joins com condições
 -- Use IN para comparações diretas com uma lista de valores
+
+
+-- ============================================
+-- Subconsultas Relacionadas (Correlated Subqueries)
+-- ============================================
+
+-- Subconsulta relacionada: usa valores da consulta externa em sua condição
+-- Para cada linha da consulta externa, a subconsulta é reavaliada
+-- Custo computacional alto em tabelas grandes
+-- ============================================
+
+SELECT e1.employee_id, e1.first_name, e1.last_name, e1.department_id, e1.salary
+FROM employees e1
+WHERE e1.salary >= (
+    SELECT TRUNC(AVG(NVL(e2.salary, 0)), 0)
+    FROM employees e2
+    WHERE e2.department_id = e1.department_id
+);
+
+-- Explicação:
+-- Para cada funcionário, a subconsulta calcula a média salarial do departamento dele
+-- Em seguida, compara o salário do funcionário com essa média
+-- Custo: a subconsulta é executada uma vez para **cada linha** da consulta externa
+-- Isso pode causar impacto significativo de performance em grandes volumes de dados
+-- Pode ser reescrita com JOINs e CTEs para otimização
+
+-- ============================================
+-- Subconsultas com Múltiplas Colunas (Multiple-Column Subquery)
+-- ============================================
+
+-- Subconsulta retorna múltiplas colunas (ex: job_id e maior salário por cargo)
+-- A comparação também deve ser feita com múltiplas colunas do SELECT externo
+-- ============================================
+
+SELECT e1.employee_id, e1.first_name, e1.job_id, e1.salary
+FROM employees e1
+WHERE (e1.job_id, e1.salary) IN (
+    SELECT e2.job_id, MAX(e2.salary)
+    FROM employees e2
+    GROUP BY e2.job_id
+);
+
+-- Explicação:
+-- A subconsulta agrupa por cargo (job_id) e retorna o maior salário de cada um
+-- A consulta externa retorna os funcionários cujo par (cargo, salário) corresponde
+-- ao par (cargo, maior salário) da subconsulta
+-- Útil para encontrar o funcionário com maior salário em cada cargo
+
+
+-- ============================================
+-- Subconsulta na cláusula FROM com JOIN
+-- ============================================
+
+-- A subconsulta é usada na cláusula FROM como uma "tabela derivada" (tabela temporária resultante da subconsulta)
+-- Essa técnica permite o uso de JOINs com os resultados da subconsulta
+-- Muito útil quando queremos agregar dados e ainda combinar com outras tabelas
+-- ============================================
+
+SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.job_id,
+    e.salary,
+    ROUND(msj.max_salary, 2) AS max_salary,
+    e.salary - ROUND(msj.max_salary, 2) AS diferenca
+FROM employees e
+LEFT JOIN (
+    SELECT job_id, MAX(salary) AS max_salary
+    FROM employees
+    GROUP BY job_id
+) msj
+    ON e.job_id = msj.job_id;
+
+-- Explicação:
+-- A subconsulta nomeada como 'msj' (max_salary_job) retorna o maior salário por cargo (job_id)
+-- Essa subconsulta funciona como uma tabela derivada temporária
+-- O LEFT JOIN conecta cada funcionário com o maior salário do seu cargo
+-- A consulta também calcula a diferença entre o salário atual e o salário máximo do cargo
+
+-- Observações:
+-- LEFT JOIN garante que todos os funcionários sejam retornados,
+-- mesmo que o cargo não exista na subconsulta (embora raro nesse caso)
+-- ROUND é usado para limitar a precisão da exibição do salário máximo e da diferença
+
+-- ============================================
+-- 📌 RECOMENDAÇÕES GERAIS SOBRE SUBCONSULTAS
+-- ============================================
+
+-- ✅ USE PARENTESES EM TODAS AS SUBCONSULTAS
+-- Todas as subconsultas devem estar entre parênteses, mesmo quando a sintaxe parecer opcional.
+
+-- ✅ ESCOLHA O OPERADOR ADEQUADO PARA O TIPO DE SUBCONSULTA
+-- - SINGLE-ROW: =, <, >, <=, >=, <>
+-- - MULTIPLE-ROW: IN, NOT IN, ANY, ALL, EXISTS, NOT EXISTS
+
+-- ✅ PREFIRA EXISTS A IN QUANDO VERIFICAR EXISTÊNCIA
+-- EXISTS geralmente oferece melhor desempenho que IN em grandes conjuntos de dados,
+-- especialmente quando há índices envolvidos.
+
+-- ⚠️ EVITE NOT IN COM VALORES NULL
+-- Se a subconsulta retornar NULL, NOT IN pode causar a consulta principal a não retornar nenhuma linha.
+-- Prefira usar NOT EXISTS nesse tipo de verificação.
+
+-- ⚠️ ATENÇÃO A SUBCONSULTAS CORRELACIONADAS
+-- Subconsultas correlacionadas (que usam valores da consulta externa) são executadas repetidamente,
+-- uma vez para cada linha da consulta principal, o que pode gerar impacto de performance.
+-- Sempre que possível, reescreva usando JOINs ou CTEs.
+
+-- ✅ NOMEIE AS SUBCONSULTAS QUANDO USADAS NO FROM
+-- Ao usar uma subconsulta no FROM, sempre dê um nome a ela (alias),
+-- pois isso é obrigatório e melhora a clareza do código.
+
+-- ✅ USE ROUND OU TRUNC EM CÁLCULOS MONETÁRIOS
+-- Para manter a precisão e legibilidade de valores salariais, arredonde os resultados conforme necessário.
+
+-- ✅ COMENTE SEU CÓDIGO
+-- Explicações em forma de comentários ajudam na manutenção e entendimento do código
+-- por outros desenvolvedores (ou por você mesmo no futuro).
+
+-- ✅ TESTE A SUBCONSULTA ISOLADAMENTE
+-- Sempre que possível, execute a subconsulta sozinha para validar seu comportamento antes de integrá-la.
+
+-- ✅ PREFIRA JOINs PARA AGREGAÇÕES COMPARATIVAS
+-- Em muitos casos, um JOIN com uma subconsulta agregada no FROM pode substituir subconsultas correlacionadas,
+-- oferecendo melhor desempenho e legibilidade.
