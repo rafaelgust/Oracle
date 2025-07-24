@@ -90,3 +90,57 @@ SELECT * FROM user_recyclebin;
 -- Para remover a tabela de forma definitiva, sem ir para a lixeira:
 DROP TABLE projects PURGE;
 
+------------------------------------------------------------
+-- ALTER TABLE
+-- Usado para modificar a estrutura de uma tabela existente.
+------------------------------------------------------------
+
+-- Adicionando uma nova coluna na tabela
+ALTER TABLE projects
+    ADD (department_id NUMBER(3));  -- Os valores existentes nessa coluna serão NULL
+
+-- Verificando a estrutura da tabela após a alteração
+DESC projects;
+
+------------------------------------------------------------
+-- REMOVENDO COLUNAS
+-- Atenção: não é possível fazer rollback após remover uma coluna.
+------------------------------------------------------------
+
+ALTER TABLE projects DROP COLUMN department_id;
+
+------------------------------------------------------------
+-- ADICIONANDO NOVAMENTE COM RESTRIÇÃO NOT NULL
+-- Como a tabela está vazia, não há conflito ao adicionar a restrição.
+------------------------------------------------------------
+
+ALTER TABLE projects
+    ADD (department_id NUMBER(4) NOT NULL);  -- Todos os registros precisarão de um valor
+
+------------------------------------------------------------
+-- MODIFICANDO UMA COLUNA EXISTENTE
+-- ALTER TABLE nome_tabela MODIFY (coluna tipo DEFAULT ...)
+------------------------------------------------------------
+
+ALTER TABLE projects
+    MODIFY (project_code VARCHAR2(6));  -- Altera o tamanho do campo project_code para 6 caracteres
+
+------------------------------------------------------------
+-- RENOMEANDO UMA COLUNA
+-- ALTER TABLE nome_tabela RENAME COLUMN nome_antigo TO nome_novo;
+------------------------------------------------------------
+
+-- Exemplo (substitua pelos nomes reais):
+-- ALTER TABLE projects RENAME COLUMN old_name TO new_name;
+
+------------------------------------------------------------
+-- TORNANDO A TABELA APENAS DE LEITURA
+------------------------------------------------------------
+
+ALTER TABLE projects READ ONLY;   -- Apenas SELECTs permitidos
+
+------------------------------------------------------------
+-- RETORNANDO PERMISSÃO DE ESCRITA NA TABELA
+------------------------------------------------------------
+
+ALTER TABLE projects READ WRITE;  -- Permite SELECT, INSERT, UPDATE e DELETE
