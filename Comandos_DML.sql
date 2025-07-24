@@ -132,3 +132,31 @@ COMMIT;
 -- - Sempre utilize a cláusula WHERE para evitar atualizações em massa indesejadas.
 -- - Use ROLLBACK antes do COMMIT se identificar erro na transação.
 -- - Subconsultas no UPDATE devem retornar apenas um único valor (escalares).
+
+-- =======================================================
+-- DELETE: COMANDO DA DML (Data Manipulation Language)
+-- Usado para remover registros de uma tabela.
+-- =======================================================
+
+-- Exemplo: Remoção de um registro específico
+DELETE FROM countries
+WHERE country_name = 'Nigeria';
+-- Atenção: Sempre utilize a cláusula WHERE para evitar excluir todos os dados da tabela.
+-- Neste exemplo, apenas o país com nome 'Nigeria' será removido da tabela countries.
+
+ROLLBACK;
+-- O ROLLBACK desfaz a exclusão *caso ela ainda não tenha sido confirmada com COMMIT*.
+-- Após o rollback, o registro da 'Nigeria' estará novamente disponível.
+
+-- ======================================
+-- Dicas Importantes:
+-- - SEMPRE inclua a cláusula WHERE em comandos DELETE para evitar exclusões em massa acidentais.
+-- - Utilize ROLLBACK para reverter a transação antes do COMMIT, caso identifique erro ou arrependimento.
+-- - Após o COMMIT, a exclusão se torna permanente (a menos que haja mecanismos como backup ou log de recuperação).
+
+-- Exemplo de exclusão perigosa (NUNCA FAÇA ISSO SEM CERTEZA)
+-- DELETE FROM countries;
+-- Isso removeria *todos* os registros da tabela 'countries'!
+
+-- Finalize com COMMIT se a exclusão for intencional e correta.
+-- COMMIT;
