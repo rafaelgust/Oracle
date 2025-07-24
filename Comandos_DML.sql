@@ -79,3 +79,56 @@ FROM employees
 WHERE job_id = 'SA_REP';
 
 -- Esse tipo de INSERT é útil para popular uma nova tabela baseada em critérios específicos de outra tabela
+
+-- =======================================================
+-- UPDATE: COMANDO DA DML (Data Manipulation Language)
+-- Usado para alterar dados existentes em uma tabela.
+-- =======================================================
+
+-- Exemplo 1: Atualização sem cláusula WHERE
+UPDATE employees
+SET salary = salary * 1.2;
+-- Atenção: esse comando atualiza o salário de *todos os empregados*,
+-- pois não há filtro (WHERE). Isso pode causar alterações indesejadas.
+
+ROLLBACK;
+-- O ROLLBACK desfaz a transação *antes do COMMIT*, revertendo as alterações.
+
+-- Exemplo 2: Atualização com filtro (forma correta)
+UPDATE employees
+SET salary = salary * 1.2
+WHERE last_name = 'King';
+-- Aqui, apenas o salário do empregado com sobrenome 'King' será atualizado.
+
+COMMIT;
+-- O COMMIT confirma as alterações no banco de dados,
+-- tornando-as visíveis para outros usuários.
+
+-- ======================================
+-- UPDATE com subconsultas
+-- ======================================
+
+-- Exemplo 3: Atualização baseada nos dados de outro empregado
+UPDATE employees
+SET job_id = (
+                SELECT job_id
+                FROM employees
+                WHERE employee_id = 141
+             ),
+    salary = (
+                SELECT salary
+                FROM employees
+                WHERE employee_id = 141
+             )
+WHERE employee_id = 140;
+-- Neste caso, o funcionário com ID 140 terá o mesmo cargo (job_id)
+-- e salário (salary) que o funcionário com ID 141.
+
+COMMIT;
+-- Confirma a atualização dos dados.
+
+-- ======================================
+-- Observações importantes:
+-- - Sempre utilize a cláusula WHERE para evitar atualizações em massa indesejadas.
+-- - Use ROLLBACK antes do COMMIT se identificar erro na transação.
+-- - Subconsultas no UPDATE devem retornar apenas um único valor (escalares).
