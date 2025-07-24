@@ -175,4 +175,59 @@ WHERE salary < ALL (
 -- retorna pelo menos um valor NULL, pois:
 -- Ex: salary != valor1 AND salary != NULL -> resultado UNKNOWN
 -- Isso faz com que nenhuma linha seja retornada
+-- USAR O NVL() PARA EVITAR NULOS
 
+-- ============================================
+-- Subconsultas com EXISTS e NOT EXISTS
+-- ============================================
+
+-- ============================================
+-- Operador EXISTS
+-- Verifica se a subconsulta retorna pelo menos uma linha
+-- Se retornar, o resultado da condição é verdadeiro (TRUE)
+-- Ideal para verificar a existência de relacionamentos entre tabelas
+-- ============================================
+SELECT d.department_id, d.department_name
+FROM departments d
+WHERE EXISTS (
+    SELECT e.department_id
+    FROM employees e
+    WHERE d.department_id = e.department_id
+);
+-- Para cada linha da tabela departments, a subconsulta é executada
+-- Se existir ao menos um funcionário no departamento, a linha será incluída no resultado
+-- É funcionalmente equivalente ao uso do operador IN nesse caso
+-- Vantagem: normalmente possui melhor performance que IN,
+-- pois o EXISTS pode parar a subconsulta assim que encontrar a primeira correspondência
+
+-- ============================================
+-- Operador NOT EXISTS
+-- Retorna verdadeiro se a subconsulta NÃO retornar nenhuma linha
+-- ============================================
+SELECT d.department_id, d.department_name
+FROM departments d
+WHERE NOT EXISTS (
+    SELECT e.department_id
+    FROM employees e
+    WHERE d.department_id = e.department_id
+);
+-- Retorna os departamentos que não possuem nenhum funcionário associado
+-- Ou seja, a subconsulta não retorna nenhuma linha, então a condição é verdadeira
+
+-- ============================================
+-- Considerações sobre EXISTS vs IN
+-- ============================================
+
+-- EXISTS:
+-- - Avalia se a subconsulta retorna pelo menos uma linha
+-- - Não se preocupa com o conteúdo das colunas da subconsulta
+-- - Melhor performance em tabelas grandes com índices adequados
+
+-- IN:
+-- - Compara um valor específico com uma lista retornada pela subconsulta
+-- - Pode ser afetado por valores NULL (especialmente com NOT IN)
+-- - Pode ser menos eficiente se a subconsulta retornar muitos valores
+
+-- Dica:
+-- Use EXISTS para checagem de existência, especialmente em joins com condições
+-- Use IN para comparações diretas com uma lista de valores
