@@ -160,3 +160,88 @@ ROLLBACK;
 
 -- Finalize com COMMIT se a exclusão for intencional e correta.
 -- COMMIT;
+
+-- ==========================================================
+-- TRANSAÇÕES EM BANCO DE DADOS
+-- ==========================================================
+-- Uma transação é um conjunto de comandos SQL que são tratados como uma única unidade lógica de trabalho.
+-- Envolve comandos DML (Data Manipulation Language): INSERT, UPDATE, DELETE.
+-- A transação se inicia com o primeiro comando DML e termina com um COMMIT (confirma) ou ROLLBACK (desfaz).
+-- Comandos DDL (CREATE, ALTER, DROP) e DCL (GRANT, REVOKE) fazem COMMIT automático.
+-- ==========================================================
+
+-- ==========================================================
+-- VANTAGENS DAS TRANSAÇÕES:
+-- - Garantem a CONSISTÊNCIA dos dados.
+-- - Permitem PRÉ-VISUALIZAR mudanças antes de torná-las permanentes.
+-- - Agrupam operações relacionadas em uma única transação.
+-- ==========================================================
+
+-- ==========================================================
+-- SAVEPOINTS: Pontos de controle intermediários na transação.
+-- Podem ser usados para desfazer parte da transação sem cancelar tudo.
+-- ==========================================================
+
+-- Exemplo de transação com SAVEPOINT
+UPDATE employees
+SET salary = salary * 1.1
+WHERE department_id = 50;
+
+SAVEPOINT updatedone;
+-- Cria um ponto de salvamento após o UPDATE.
+
+INSERT INTO employees (employee_id, first_name, last_name, email, hire_date, job_id, salary)
+VALUES (999, 'Novo', 'Empregado', 'novo.emp@empresa.com', SYSDATE, 'IT_PROG', 6000);
+
+-- Algo deu errado? Podemos desfazer apenas o INSERT:
+ROLLBACK TO updatedone;
+
+-- A alteração salarial ainda está mantida, pois foi antes do SAVEPOINT.
+
+-- Podemos encerrar a transação:
+COMMIT;
+
+-- ==========================================================
+-- LOCKS E CONSISTÊNCIA DE LEITURA
+-- ==========================================================
+-- Durante uma transação, as linhas afetadas ficam bloqueadas (LOCKED).
+-- Outras sessões não podem modificar ou deletar essas linhas até que a transação termine.
+-- O Oracle garante leitura consistente através dos segmentos de undo (undo segments).
+
+-- ==========================================================
+-- SELECT ... FOR UPDATE
+-- ==========================================================
+-- Usado para bloquear linhas retornadas por um SELECT para atualização posterior.
+-- Evita que outras transações modifiquem esses dados até o COMMIT ou ROLLBACK.
+-- ==========================================================
+
+-- Exemplo 1: Lock em todas as colunas das linhas retornadas
+SELECT employee_id, salary, commission_pct, job_id
+FROM employees
+WHERE job_id = 'SA_REP'
+FOR UPDATE
+ORDER BY employee_id;
+
+-- Após realizar as alterações desejadas, finalize com COMMIT:
+COMMIT;
+
+-- Exemplo 2: Lock apenas na coluna SALARY da tabela EMPLOYEES
+SELECT e.employee_id, e.salary, e.commission_pct
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE e.job_id = 'ST_CLERK'
+  AND d.location_id = 1500
+FOR UPDATE OF e.salary
+ORDER BY e.employee_id;
+
+-- O lock será aplicado apenas às linhas da tabela EMPLOYEES, e somente à coluna salary.
+
+COMMIT;
+
+-- ==========================================================
+-- LEMBRETES FINAIS:
+-- - Sempre utilize COMMIT para confirmar transações quando estiver certo.
+-- - Utilize ROLLBACK em caso de erro ou verificação antes de confirmar.
+-- - SAVEPOINTs ajudam a modular partes da transação de forma segura.
+-- - SELECT ... FOR UPDATE ajuda a garantir integridade durante alterações concorrentes.
+-- ==========================================================
