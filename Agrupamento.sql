@@ -2,40 +2,40 @@
 ----- GROUP BY | Formar os grupos
 ----- HAVING | Seleciona os grupos a serem recuperados
 
----- AVG -> MÉDIA DO GRUPO [númericos]
----- COUNT -> NÚMERO DE LINHAS DO GRUPO
+---- AVG -> Mï¿½DIA DO GRUPO [nï¿½mericos]
+---- COUNT -> Nï¿½MERO DE LINHAS DO GRUPO
 ---- MAX -> MAIOR VALOR DO GRUPO
 ---- MIN -> MENOR VALOR DO GRUPO
----- SUM -> SOMATORIO DO GRUPO [númericos]
----- STDDEV -> DESVICO PADRÃO DO GRUPO
+---- SUM -> SOMATORIO DO GRUPO [nï¿½mericos]
+---- STDDEV -> DESVICO PADRï¿½O DO GRUPO
 ---- VARIANCE -> VARIANCIA DO GRUPO
 
 ----- SINTAXY
---------- SELECT função_grupo(coluna), ... FROM tabela [WHERE condição] [ORDER BY coluna]
+--------- SELECT funï¿½ï¿½o_grupo(coluna), ... FROM tabela [WHERE condiï¿½ï¿½o] [ORDER BY coluna]
 
-SELECT COUNT(*) FROM pcempr; --- quantidade de funcionários
-SELECT COUNT(EMAIL) FROM pcempr; --- quantidade de funcionários com email
----- COUNT(DISTINCT exp) -> SÓ VAI CONTAR LINHAS UNICAS
+SELECT COUNT(*) FROM pcempr; --- quantidade de funcionï¿½rios
+SELECT COUNT(EMAIL) FROM pcempr; --- quantidade de funcionï¿½rios com email
+---- COUNT(DISTINCT exp) -> Sï¿½ VAI CONTAR LINHAS UNICAS
 SELECT COUNT(PVENDA) FROM PCTABPR; --- 203738
 SELECT COUNT(DISTINCT PVENDA) FROM PCTABPR; --- 89869
 
 --- EVITAR NULOS NO AVG
 SELECT AVG(NVL(PVENDA, 0)) FROM PCTABPR;
 
-SELECT AVG(PVENDA) "Média", SUM(PVENDA) "Somatório", MIN(PVENDA) "Mínimo", MAX(PVENDA) "Máximo"
+SELECT AVG(PVENDA) "Mï¿½dia", SUM(PVENDA) "Somatï¿½rio", MIN(PVENDA) "Mï¿½nimo", MAX(PVENDA) "Mï¿½ximo"
     FROM PCTABPR;
 
-SELECT AVG(PVENDA) "Média", SUM(PVENDA) "Somatório", MIN(PVENDA) "Mínimo", MAX(PVENDA) "Máximo"
+SELECT AVG(PVENDA) "Mï¿½dia", SUM(PVENDA) "Somatï¿½rio", MIN(PVENDA) "Mï¿½nimo", MAX(PVENDA) "Mï¿½ximo"
     FROM PCTABPR;
     
 SELECT MIN(ADMISSAO) "Mais Antigo", MAX(ADMISSAO) "Mais Recente"
     FROM pcempr;
     
 ---- GROUP BY - GRUPOS ADICIONAIS
-------- SELECT coluna, função_grupo(coluna)
+------- SELECT coluna, funï¿½ï¿½o_grupo(coluna)
 ----------- FROM tabela
------------ [WHERE condição]
------------ [GROUP BY expressão_group_by]
+----------- [WHERE condiï¿½ï¿½o]
+----------- [GROUP BY expressï¿½o_group_by]
 ----------- [ORDER BY coluna];
 
 SELECT CODEPTO, COUNT(*) AS total_produtos --- contando quantos produtos tem de cada CODEPTO
@@ -52,23 +52,23 @@ ORDER BY MUNICCOB, BAIRROCOB;
 -- SELECT department_id, MAX(salary) FROM employees
 -- WHERE MAX(salary) > 10000
 -- GROUP BY department_id;
------- código vai quebrar pois WHERE não referencia função de grupo -> WHERE MAX(salary) > 10000
+------ cï¿½digo vai quebrar pois WHERE nï¿½o referencia funï¿½ï¿½o de grupo -> WHERE MAX(salary) > 10000
 ------ precisa do HAVING
 
 ----- HAVING
---- SELECT coluna, função_grupo
+--- SELECT coluna, funï¿½ï¿½o_grupo
 --- FROM tabela
---- [WHERE condição_linha]
---- [GROUP BY expressão_grupo]
---- [HAVING condição_grupo]
+--- [WHERE condiï¿½ï¿½o_linha]
+--- [GROUP BY expressï¿½o_grupo]
+--- [HAVING condiï¿½ï¿½o_grupo]
 --- [ORDER BY coluna]
 
 -- SELECT department_id, MAX(salary) FROM employees
 -- GROUP BY department_id;
 -- HAVING MAX(salary)>10000;
------ código vai retornar uma lista agrupada pelo department_id apenas com os salarios superiores a 10000
+----- cï¿½digo vai retornar uma lista agrupada pelo department_id apenas com os salarios superiores a 10000
 
---------- SEQUÊNCIA LÓGICA
+--------- SEQUï¿½NCIA Lï¿½GICA
 ----- WHERE -> SELECIONA LINHAS
 ----- GROUP BY -> FORMA OS GRUPOS
 ----- HAVING -> SELECIONA OS GRUPOS A SEREM RECUPERADOS

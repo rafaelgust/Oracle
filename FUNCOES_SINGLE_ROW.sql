@@ -1,101 +1,144 @@
------ Tabela **dual** para calculos
+-- ========================
+-- FUNÃ‡Ã•ES SQL E A TABELA DUAL
+-- ========================
 
+-- A tabela DUAL Ã© usada em consultas que nÃ£o precisam acessar uma tabela real,
+-- Ãºtil para cÃ¡lculos, testes e uso de funÃ§Ãµes embutidas.
 
---- CARACTERÍSTICAS
+-- ========================================
+-- FUNÃ‡Ã•ES DE MANIPULAÃ‡ÃƒO DE STRINGS (CARACTERES)
+-- ========================================
 
----- PODEM MANIPULAR INTES DE DADOS
----- RECEBER ARGUMETNOS E RETORNAR UM VALOR
----- ATUAM SOBRE CADA LINHA RETORNADA
----- RETORNAM UM RESULTADO POR LINHA
----- PODEM MODIFICAR O TIPO DE DADO
----- PODEM SER ANINHADAS
----- RECEBEM ARGUMENTOS QUE PODEM SER COLUNAS OU EXPRESSÕES
+-- CaracterÃ­sticas gerais:
+-- - Podem manipular itens de dados.
+-- - Recebem argumentos e retornam um valor.
+-- - Atuam sobre cada linha retornada.
+-- - Retornam um resultado por linha.
+-- - Podem modificar o tipo de dado.
+-- - Podem ser aninhadas.
+-- - Recebem argumentos que podem ser colunas ou expressÃµes.
 
----- SINTAXE: nome_função[(arg1, arg2,...)]
---------- LOWER() -> minimiza o texto
---------- UPPER() -> DEIXA O TEXTO MAIÚSCULO
---------- INITCAP() -> Primeiro Caracterer Maiúsculo
+-- Sintaxe geral: nome_funÃ§Ã£o(argumento1, argumento2, ...)
 
+-- Exemplos:
+-- LOWER()     => transforma o texto em minÃºsculas
+-- UPPER()     => transforma o texto em maiÃºsculas
+-- INITCAP()   => primeira letra de cada palavra em maiÃºscula
+
+-- Exemplo prÃ¡tico com a coluna DESCRICAO da tabela PCPRODUT:
 SELECT * FROM pcprodut WHERE DESCRICAO LIKE '%luva%';
-    --- Não vai encontrar, pois não há caracteres minúsculos na coluna DESCRICAO
-    
-SELECT * FROM pcprodut WHERE DESCRICAO LIKE UPPER('%luva%');
-    --- Converteu para LUVA e encontrou os registros
-    
-SELECT * FROM pcprodut WHERE LOWER(DESCRICAO) LIKE '%luva%';
-    --- COLUNA PASSOU POR UM LOWER, COM ISSO FOI LOCALIZADO O VALOR luva
-    
----- FUNÇÕES PARA MANIPULACAO DE CARACTERES
------ CONCAT('VALOR1', 'VALOR2') -> VALOR1VALOR2 | concatenear
------ SUBSTR('Introdução ORACLE 19C', 1, 11) -> Introdução | cortou a string do 1 para 11
------ LENGTH('Introdução ORACLE 19C') -> 21 | tamanho
------ INSTR('Introdução ORACLE 19C','ORACLE') -> 12 | A palavra buscado começa no index 12 
+-- NÃ£o encontra, pois nÃ£o hÃ¡ caracteres minÃºsculos na coluna DESCRICAO
 
+SELECT * FROM pcprodut WHERE DESCRICAO LIKE UPPER('%luva%');
+-- Converteu para 'LUVA' e encontrou os registros
+
+SELECT * FROM pcprodut WHERE LOWER(DESCRICAO) LIKE '%luva%';
+-- Converte o conteÃºdo da coluna para minÃºsculo antes de comparar
+
+-- Mais funÃ§Ãµes Ãºteis para strings:
 SELECT 
-    CONCAT('VALOR1', 'VALOR2'),
-    SUBSTR('Introducao ORACLE 19C', 1, 11),
-    LENGTH('Introducao ORACLE 19C'),
-    INSTR('Introducao ORACLE 19C','ORACLE')
+    CONCAT('VALOR1', 'VALOR2') AS CONCATENADO,           -- Junta os dois valores
+    SUBSTR('Introducao ORACLE 19C', 1, 11) AS SUBSTRING, -- Retorna substring do 1Âº ao 11Âº caractere
+    LENGTH('Introducao ORACLE 19C') AS TAMANHO,          -- Conta o nÃºmero de caracteres
+    INSTR('Introducao ORACLE 19C','ORACLE') AS POSICAO   -- Retorna a posiÃ§Ã£o de 'ORACLE'
 FROM dual;
 
------ LPAD('Introdução ORACLE 19C',30,'*') -> ATRIBUIU CARACTERES ANTERIOR AO VALOR
------ RPAD('Introdução ORACLE 19C',30,'*') -> ATRIBUIU CARACTERES POSTERIOR AO VALOR
------ REPLACE('Introdução ORACLE 12C','12C','19C') -> SUBSTITUI CARACTERES
------ TRIM(';' FROM 'nome@gmail.com;') -> REMOVE o valor ';' da STRING 'nome@gmail.com;'
------ RTRIM('nome@gmail.com;', ';') -> REMOVE VALOR DA DIREITA
------ LTRIM('  nome@gmail.com', ' ') -> REMOVE VALOR DA ESQUERDA
+SELECT 
+    LPAD('Introducao ORACLE 19C', 30, '*') AS LPAD_EXEMPLO,  -- Preenche com * Ã  esquerda atÃ© 30 caracteres
+    RPAD('Introducao ORACLE 19C', 30, '*') AS RPAD_EXEMPLO,  -- Preenche com * Ã  direita
+    REPLACE('Introducao ORACLE 12C', '12C', '19C') AS SUBSTITUIDO, -- Substitui '12C' por '19C'
+    TRIM(';' FROM 'nome@gmail.com;') AS TRIM_TOTAL,          -- Remove ; da esquerda e direita
+    LTRIM('  nome@gmail.com', ' ') AS TRIM_ESQUERDA,         -- Remove espaÃ§os Ã  esquerda
+    RTRIM('nome@gmail.com;', ';') AS TRIM_DIREITA            -- Remove ; da direita
+FROM dual;
 
-SELECT CLIENTE, REPLACE(CLIENTE, 'DROGA BABY LTDA', 'DROGARIA BABY') AS LOCAL
-    FROM PCCLIENT
-    WHERE CLIENTE = 'DROGA BABY LTDA';
-    
----- FUNÇÕES TIPO NUMBER
------ ROUND - ARREDONDAR
------ TRUNC - TRUCA O VALOR PARA A CASA DECIMAL ESPECIFICA
------ MOD - RETORNAR O RESTO DA DIVISAO
------ ABS - RETORNA O VALOR ABSOLUTO DO NÚMERO
------ SQRT - RETORNAR A RAIZ DO NÚMERO
+-- Exemplo de substituiÃ§Ã£o em uma tabela:
+SELECT CLIENTE, REPLACE(CLIENTE, 'DROGA BABY LTDA', 'DROGARIA BABY') AS NOVO_NOME
+FROM PCCLIENT
+WHERE CLIENTE = 'DROGA BABY LTDA';
 
-SELECT ROUND(45.923,0), ROUND(45.923,2), ROUND(45.926,2) FROM dual;
-SELECT TRUNC(45.923,0), TRUNC(45.923,2) FROM dual; -- corta
-SELECT MOD(1300,600) AS RESTO FROM dual; -- resto da divisão
-SELECT ABS(-9), SQRT(9) FROM dual;
+-- ========================================
+-- FUNÃ‡Ã•ES NUMÃ‰RICAS
+-- ========================================
 
----- FUNÇÕES TIPO DATE
------ O formato default de exibição de datas é definido pelo 
------ DBA pelo parametro NLS_DATE_FORMAT
---- sysdate DATA DE HOJE
+-- ROUND(nÃºmero, casas)    => Arredonda
+-- TRUNC(nÃºmero, casas)    => Trunca (corta) o nÃºmero sem arredondar
+-- MOD(dividendo, divisor) => Resto da divisÃ£o
+-- ABS(valor)              => Valor absoluto
+-- SQRT(valor)             => Raiz quadrada
 
-SELECT sysdate FROM dual;
+SELECT 
+    ROUND(45.923, 0) AS ARREDONDADO_0,
+    ROUND(45.923, 2) AS ARREDONDADO_2A,
+    ROUND(45.926, 2) AS ARREDONDADO_2B
+FROM dual;
 
----- Cálculo com datas
------ data + número => data - Adiciona um número de dias para uma data
------ data - número => data - Subtrai um número de dias a partir de uma data
------ data - data => Número de dias - Subtrai uma data a partir de outra
------ data + número/24 => data - Adiciona um número de horas para uma data
+SELECT 
+    TRUNC(45.923, 0) AS TRUNCADO_0,
+    TRUNC(45.923, 2) AS TRUNCADO_2
+FROM dual;
 
-SELECT sysdate, sysdate + 30, sysdate + 60, sysdate - 30 FROM dual;
+SELECT 
+    MOD(1300, 600) AS RESTO_DIVISAO
+FROM dual;
 
-SELECT NOME, ROUND((sysdate - ADMISSAO)/7,2) AS "SEMANAS DE TRABALHO" 
-    FROM pcempr;
-    --- SEMANAS DE TRABALHO A PARTIR DA ADMISSAO COM A DATA ATUAL
+SELECT 
+    ABS(-9) AS VALOR_ABSOLUTO,
+    SQRT(9) AS RAIZ_QUADRADA
+FROM dual;
 
----- OUTRAS FUNÇÕES TIPO DATE
------ MONTHS_BETWEEN -> NÚMERO DE MESES ENTRE DATAS
------ ADD_MOUNTHS -> ADICIONA MESES A UMA DATA
------ NEXT_DAY -> PRÓXIMO DIA DA DATA ESPECIFICADA | 'que dia é a próxima sexta'
------ LAST_DAY -> ÚLTIMO DIA DO MÊS
------ ROUND(sysdate, 'MONTH/YEAR') -> ARREDONDAR A DATA - Se o dia é maior ou menor a metade do mês
------ TRUNC(sysdate, 'MONTH') -> primeiro dia do mês
------ TRUNC(sysdate, 'MONTH/YEAR') -> primeiro dia do ano
------ TRUNC(sysdate) -> TRUNCAR A DATA
+-- ========================================
+-- FUNÃ‡Ã•ES DE DATA
+-- ========================================
 
+-- A data padrÃ£o no Oracle Ã© definida pelo parÃ¢metro NLS_DATE_FORMAT
+-- sysdate retorna a data e hora atual do servidor Oracle
 
-SELECT NOME, ROUND(MONTHS_BETWEEN(sysdate, ADMISSAO),2) AS "MESES DE TRABALHO" 
-    FROM pcempr;
-    
-SELECT sysdate, ADD_MONTHS(sysdate, 3), NEXT_DAY(sysdate, 'SEXTA FEIRA'), LAST_DAY(sysdate)
-    FROM dual;
+SELECT sysdate AS DATA_ATUAL FROM dual;
 
-SELECT sysdate, TO_CHAR(TRUNC(sysdate), 'DD/MM/YYYY HH24:MI:SS') from dual;
+-- CÃ¡lculos com datas:
+-- data + nÃºmero      => adiciona dias
+-- data - nÃºmero      => subtrai dias
+-- data - data        => retorna diferenÃ§a em dias
+-- data + n/24        => adiciona n horas
 
+SELECT 
+    sysdate AS HOJE,
+    sysdate + 30 AS MAIS_30_DIAS,
+    sysdate + 60 AS MAIS_60_DIAS,
+    sysdate - 30 AS MENOS_30_DIAS
+FROM dual;
+
+-- Semanas de trabalho desde a admissÃ£o:
+SELECT 
+    NOME,
+    ROUND((sysdate - ADMISSAO)/7, 2) AS SEMANAS_TRABALHO
+FROM pcempr;
+
+-- Outras funÃ§Ãµes de data:
+-- MONTHS_BETWEEN(data1, data2) => retorna nÃºmero de meses entre duas datas
+-- ADD_MONTHS(data, n)          => adiciona n meses
+-- NEXT_DAY(data, 'DIA_SEMANA') => prÃ³xima ocorrÃªncia do dia da semana
+-- LAST_DAY(data)               => Ãºltimo dia do mÃªs da data
+-- ROUND(sysdate, 'MONTH')      => arredonda para o mÃªs mais prÃ³ximo
+-- TRUNC(sysdate, 'MONTH')      => primeiro dia do mÃªs
+-- TRUNC(sysdate, 'YEAR')       => primeiro dia do ano
+-- TRUNC(sysdate)               => remove parte da hora
+
+SELECT 
+    NOME,
+    ROUND(MONTHS_BETWEEN(sysdate, ADMISSAO), 2) AS MESES_TRABALHO
+FROM pcempr;
+
+SELECT 
+    sysdate AS HOJE,
+    ADD_MONTHS(sysdate, 3) AS MAIS_3_MESES,
+    NEXT_DAY(sysdate, 'SEXTA FEIRA') AS PROXIMA_SEXTA,
+    LAST_DAY(sysdate) AS FIM_DO_MES
+FROM dual;
+
+-- Formatar data com TO_CHAR para incluir hora completa
+SELECT 
+    sysdate AS DATA_COMPLETA,
+    TO_CHAR(TRUNC(sysdate), 'DD/MM/YYYY HH24:MI:SS') AS DATA_FORMATADA
+FROM dual;
