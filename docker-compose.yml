@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-xe
+    ports:
+      - "1521:1521"   # Porta padrão do Oracle
+      - "5500:5500"   # Oracle Enterprise Manager
+    environment:
+      ORACLE_PASSWORD: Oracle123       # Sem aspas - senha simples
+      ORACLE_RANDOM_PASSWORD: "false"  # Desabilita senha aleatória
+    volumes:
+      - oracle-data:/opt/oracle/oradata    # Volume nomeado para persistir dados
+      - oracle-logs:/opt/oracle/diag       # Volume nomeado para logs
+    networks:
+      - oracle-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "sqlplus -s sys/Oracle123@XE as sysdba <<< 'SELECT 1 FROM DUAL;' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+
+networks:
+  oracle-net:
+    driver: bridge
+
+volumes:
+  oracle-data:
+    driver: local
+  oracle-logs:
+    driver: local
+
+
+# sudo mkdir -p oracle-data oracle-logs
+# sudo chown -R 54321:54321 oracle-data oracle-logs
+# sudo chmod -R 755 oracle-data oracle-logs
+
+# Dentro do container, conecte como sysdba
+# docker exec -it oracle-xe sqlplus / as sysdba
+
+# # Reset das senhas manualmente
+# SQL> ALTER USER sys IDENTIFIED BY Oracle123;
+# SQL> ALTER USER system IDENTIFIED BY Oracle123;
+# SQL> exit
